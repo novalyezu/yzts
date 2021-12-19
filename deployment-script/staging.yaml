@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: staging-yzts
+  labels:
+    app: staging-yzts
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    app: staging-yzts
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staging-yzts
+  labels:
+    app: staging-yzts
+spec:
+  selector:
+    matchLabels:
+      app: staging-yzts
+  template:
+    metadata:
+      labels:
+        app: staging-yzts
+    spec:
+      containers:
+      - image: gcr.io/google-project-id/staging-yzts:0.1.2
+        name: staging-yzts
+        ports:
+        - containerPort: 3000
+          name: staging-yzts

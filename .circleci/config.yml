@@ -1,0 +1,95 @@
+version: 2.1
+jobs:
+  backend-build:
+    docker:
+      - image: wecs/circle-ci-gcloud-node:0.1.0
+    working_directory: ~/workspace
+    environment:
+      DEPLOYMENT_NAME: backend-yzts
+      PROJECT_ID: google-project-id
+      CLUSTER_NAME: yzts-cluster
+      CLOUDSDK_COMPUTE_ZONE: asia-southeast2
+      CONTAINER_NAME: backend-yzts
+      REG_ID: backend-yzts
+      DEPLOYMENT_ENVIRONMENT: production
+      ACCOUNT_ID: circleci-service@google-project-id.iam.gserviceaccount.com
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Make script Executable
+          command: chmod +x ./deployment-script/deployment.sh
+      - run:
+          name: Build and Deploy
+          command: |
+            sh +x deployment-script/deployment.sh
+      - run:
+          name: Discord - Sending on Failure Condition
+          command: |
+            branch=`git branch -q`
+            message=`git log -1 --pretty=format:%s`
+            curl -H "Content-Type: application/json" -d '{"username": "Circle Backend", "content": "[FAILED] :poop::poop::poop: CircleCI failed building Backend. \n**Branch**: `'"${branch}"'`\n**Commit message**: ```'"${message}"'```"}' https://discord.com/api/webhooks/
+          when: on_fail
+      - run:
+          name: Discord - Sending on Success Condition
+          command: |
+            branch=`git branch -q`
+            message=`git log -1 --pretty=format:%s`
+            curl -H "Content-Type: application/json" -d '{"username": "Circle Backend", "content": "[SUCCESSFULL] :white_check_mark: :white_check_mark: :white_check_mark: CircleCI finished building Backend. \n**Branch**: `'"${branch}"'`\n**Commit message**: ```'"${message}"'```"}' https://discord.com/api/webhooks/
+          when: on_success
+
+  staging-build:
+    docker:
+      - image: wecs/circle-ci-gcloud-node:0.1.0
+    working_directory: ~/workspace
+    environment:
+      DEPLOYMENT_NAME: staging-yzts
+      PROJECT_ID: google-project-id
+      CLUSTER_NAME: yzts-staging-cluster
+      CLOUDSDK_COMPUTE_ZONE: asia-southeast2-a
+      CONTAINER_NAME: staging-yzts
+      REG_ID: staging-yzts
+      DEPLOYMENT_ENVIRONMENT: staging
+      ACCOUNT_ID: circleci-service@google-project-id.iam.gserviceaccount.com
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Make script Executable
+          command: chmod +x ./deployment-script/staging.sh
+      - run:
+          name: Build and Deploy
+          command: |
+            sh +x deployment-script/staging.sh
+      - run:
+          name: Discord - Sending on Failure Condition
+          command: |
+            branch=`git branch -q`
+            message=`git log -1 --pretty=format:%s`
+            curl -H "Content-Type: application/json" -d '{"username": "Circle Backend", "content": "[FAILED] :poop::poop::poop: CircleCI failed building Backend. \n**Branch**: `'"${branch}"'`\n**Commit message**: ```'"${message}"'```"}' https://discord.com/api/webhooks/
+          when: on_fail
+      - run:
+          name: Discord - Sending on Success Condition
+          command: |
+            branch=`git branch -q`
+            message=`git log -1 --pretty=format:%s`
+            curl -H "Content-Type: application/json" -d '{"username": "Circle Backend", "content": "[SUCCESSFULL] :white_check_mark: :white_check_mark: :white_check_mark: CircleCI finished building Backend. \n**Branch**: `'"${branch}"'`\n**Commit message**: ```'"${message}"'```"}' https://discord.com/api/webhooks/
+          when: on_success
+
+workflows:
+  backend-deployment:
+    jobs:
+      - backend-build:
+          filters:
+            branches:
+              only:
+                - main
+                - circleci-editor/556/main
+
+  staging-deployment:
+    jobs:
+      - staging-build:
+          filters:
+            branches:
+              only:
+                - staging

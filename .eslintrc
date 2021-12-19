@@ -1,0 +1,27 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 2020,
+        "project": "./tsconfig.json"
+    },
+    "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "airbnb-base",
+        "airbnb-typescript/base"
+    ],
+    "rules": {
+        "quotes": [
+            "error",
+            "single",
+            { "avoidEscape": true, "allowTemplateLiterals": false }
+        ],
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "no-console": "off",
+        "import/prefer-default-export": "off",
+        "import/no-cycle": "off",
+        "max-len": ["error", { "code": 150, "tabWidth": 2 }]
+    },
+    "ignorePatterns": ["**/*.spec.ts"]
+}
