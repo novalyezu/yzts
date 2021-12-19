@@ -1,5 +1,5 @@
 # yzts
-My boilerplate for express and typescript. Feel free to use.
+My boilerplate for express and typescript. Include CI/CD with Kubernetes and Docker setup for CircleCI. Feel free to use.
 
 ### Scripts Available
 * `npm run dev` - run on development mode
